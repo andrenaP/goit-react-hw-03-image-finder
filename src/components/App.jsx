@@ -10,12 +10,27 @@ import Modal from './Modal';
 
 class App extends Component {
   state = {
-    contacts: [],
-    filter: '',
+    searchQuery: '',
+    page: 1,
+  };
+
+  incrementPage = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
+
+  handleFormSubmit = searchQuery => {
+    this.setState({ searchQuery, page: 1 });
   };
 
   render() {
-    return <div>{'hi'}</div>;
+    return (
+      <div>
+        <Searchbar onSubmit={this.handleFormSubmit} />
+        <ImageGallery />
+      </div>
+    );
   }
 }
 
