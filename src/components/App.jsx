@@ -28,7 +28,11 @@ class App extends Component {
     return (
       <div>
         <Searchbar onSubmit={this.handleFormSubmit} />
-        <ImageGallery />
+        <ImageGallery
+          searchQuery={this.state.searchQuery}
+          page={this.state.page}
+          incrementPage={this.incrementPage}
+        />
       </div>
     );
   }
