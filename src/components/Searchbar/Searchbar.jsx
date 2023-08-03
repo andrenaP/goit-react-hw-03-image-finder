@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import css from './Searchbar.css';
+import './Searchbar.css';
+import Notiflix from 'notiflix';
 
 class Searchbar extends Component {
   state = { searchQuery: '' };
@@ -12,7 +13,7 @@ class Searchbar extends Component {
   handleSubmit = e => {
     e.preventDefault();
     if (this.state.searchQuery.trim() === '') {
-      console.log('Please, enter search query!');
+      Notiflix.Notify.warning('Please, enter search query!');
       return;
     }
     this.props.onSubmit(this.state.searchQuery);

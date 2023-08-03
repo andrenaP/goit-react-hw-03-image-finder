@@ -1,0 +1,16 @@
+.galleryItem {
+  /* width: 440px; */
+  /* height: 550px; */
+  /* border-radius: 17px;
+  transition: all 0.3s;
+  background-color: #adfff7; */
+  display: grid;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+.galleryImg {
+  width: 400px;
+  height: 300px;
+}

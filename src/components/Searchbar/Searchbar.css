@@ -1,0 +1,11 @@
+.searchbar {
+  color: brown;
+}
+.form {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.input {
+  width: 200px;
+}

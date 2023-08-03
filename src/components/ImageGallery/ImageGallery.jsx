@@ -1,8 +1,12 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import css from './ImageGallery.css';
+import './ImageGallery.css';
 import axios from 'axios';
+import Notiflix from 'notiflix';
 import Button from '../Button';
+import ImageGalleryItem from '../ImageGalleryItem';
+import Modal from '../Modal';
+import Loader from '../Loader';
 
 const perPage = 12;
 const API_KEY = '37324716-561554bcb566b8f1f5945e5c9';
@@ -16,14 +20,24 @@ class ImageGallery extends Component {
     loadMore: false,
     showModal: false,
   };
+  handleImageClick = largeImageURL => {
+    this.setState({
+      showModal: true,
+      largeImageURL,
+    });
+  };
+  onModalClose = () => {
+    this.setState({
+      showModal: false,
+    });
+  };
+
   handleIncrementPage = () => {
     const { incrementPage } = this.props;
     incrementPage();
   };
   async componentDidUpdate(prevProps, prevState) {
-    console.log('componentDidUpdate');
     const { page, searchQuery } = this.props;
-    console.log(page);
     if (prevProps.searchQuery !== searchQuery) {
       this.resetPage();
     }
@@ -37,15 +51,14 @@ class ImageGallery extends Component {
         );
 
         const parseResponse = await result;
-        console.log(parseResponse);
         this.setState(prevState => ({
           galleryItems: [...prevState.galleryItems, ...parseResponse.data.hits],
           status: 'resolved',
-          loadMore: page < Math.ceil(parseResponse.totalHits / 12),
+          loadMore: true,
         }));
       } catch (error) {
-        console.log(error);
-        this.setState({ status: 'rejected' });
+        Notiflix.Notify.failure(error);
+        this.setState({ status: 'rejected', loadMore: false });
       }
     }
   }
@@ -54,17 +67,50 @@ class ImageGallery extends Component {
   }
   render() {
     const { galleryItems, status, loadMore, showModal } = this.state;
-    // console.log(this.state);
+    if (status === 'pending') return <Loader />;
+    if (status === 'rejected') {
+      Notiflix.Notify.failure('Oops, something went wrong! Please, try again!');
+      return;
+    }
+    if (status === 'resolved')
+      if (galleryItems.length === 0) {
+        Notiflix.Notify.failure(
+          `Sorry, there are no images matching search query`
+        );
+        return;
+      }
+
     return (
-      <ul className="gallery">
-        {status};
-        {galleryItems.map(({ id, webformatURL, tags, largeImageURL }) => {
-          return <div key={id}>{largeImageURL}</div>;
-        })}
-        <Button onClick={this.handleIncrementPage}></Button>
-      </ul>
+      <div>
+        <ul className="galleryItems">
+          {galleryItems.map(({ id, webformatURL, tags, largeImageURL }) => {
+            return (
+              <ImageGalleryItem
+                key={id}
+                smallPicture={webformatURL}
+                alt={tags}
+                onClick={this.handleImageClick}
+                largeImage={largeImageURL}
+              />
+            );
+          })}
+        </ul>
+        {showModal && (
+          <Modal
+            largeImage={this.state.largeImageURL}
+            onModalClose={this.onModalClose}
+          />
+        )}
+        {loadMore && <Button onClick={this.handleIncrementPage}></Button>}
+      </div>
     );
   }
 }
 
 export default ImageGallery;
+
+ImageGallery.propTypes = {
+  searchQuery: PropTypes.string,
+  page: PropTypes.number.isRequired,
+  incrementPage: PropTypes.func.isRequired,
+};
