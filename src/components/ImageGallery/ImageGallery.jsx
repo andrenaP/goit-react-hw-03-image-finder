@@ -54,11 +54,11 @@ class ImageGallery extends Component {
         this.setState(prevState => ({
           galleryItems: [...prevState.galleryItems, ...parseResponse.data.hits],
           status: 'resolved',
-          loadMore: true,
+          loadMore: page < Math.ceil(parseResponse.data.totalHits / 12),
         }));
       } catch (error) {
         Notiflix.Notify.failure(error);
-        this.setState({ status: 'rejected', loadMore: false });
+        this.setState({ status: 'rejected' });
       }
     }
   }
@@ -75,26 +75,28 @@ class ImageGallery extends Component {
     if (status === 'resolved')
       if (galleryItems.length === 0) {
         Notiflix.Notify.failure(
-          `Sorry, there are no images matching search query`
+          `Sorry, there are no images matching search query ${this.props.searchQuery}`
         );
         return;
       }
-
+    console.log(loadMore);
     return (
       <div>
-        <ul className="galleryItems">
-          {galleryItems.map(({ id, webformatURL, tags, largeImageURL }) => {
-            return (
-              <ImageGalleryItem
-                key={id}
-                smallPicture={webformatURL}
-                alt={tags}
-                onClick={this.handleImageClick}
-                largeImage={largeImageURL}
-              />
-            );
-          })}
-        </ul>
+        {status === 'resolved' && (
+          <ul className="galleryItems">
+            {galleryItems.map(({ id, webformatURL, tags, largeImageURL }) => {
+              return (
+                <ImageGalleryItem
+                  key={id}
+                  smallPicture={webformatURL}
+                  alt={tags}
+                  onClick={this.handleImageClick}
+                  largeImage={largeImageURL}
+                />
+              );
+            })}
+          </ul>
+        )}
         {showModal && (
           <Modal
             largeImage={this.state.largeImageURL}
